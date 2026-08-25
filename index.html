@@ -1,0 +1,1799 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Math Scholar - Fact Fluency Master</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        heading: ['Fredoka', 'sans-serif'],
+                        body: ['Outfit', 'sans-serif'],
+                    },
+                    colors: {
+                        scholar: {
+                            50: '#f0fdf4',
+                            100: '#dcfce7',
+                            500: '#22c55e',
+                            600: '#16a34a',
+                            700: '#15803d',
+                        },
+                        accent: {
+                            purple: '#8b5cf6',
+                            amber: '#f59e0b',
+                            rose: '#f43f5e',
+                            cyan: '#06b6d4',
+                            gold: '#fbbf24',
+                            silver: '#94a3b8',
+                            bronze: '#b45309'
+                        }
+                    },
+                    keyframes: {
+                        shake: {
+                            '10%, 90%': { transform: 'translate3d(-2px, 0, 0)' },
+                            '20%, 80%': { transform: 'translate3d(4px, 0, 0)' },
+                            '30%, 50%, 70%': { transform: 'translate3d(-6px, 0, 0)' },
+                            '40%, 60%': { transform: 'translate3d(6px, 0, 0)' }
+                        },
+                        popIn: {
+                            '0%': { opacity: '0', transform: 'scale(0.85)' },
+                            '100%': { opacity: '1', transform: 'scale(1)' }
+                        }
+                    },
+                    animation: {
+                        'shake': 'shake 0.4s cubic-bezier(.36,.07,.19,.97) both',
+                        'pop-in': 'popIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards',
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .heading-font {
+            font-family: 'Fredoka', sans-serif;
+        }
+        .glass-card {
+            background: rgba(30, 41, 59, 0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .btn-glow {
+            box-shadow: 0 0 15px rgba(139, 92, 246, 0.4);
+            transition: all 0.2s ease;
+        }
+        .btn-glow:hover {
+            box-shadow: 0 0 25px rgba(139, 92, 246, 0.7);
+            transform: translateY(-2px);
+        }
+        body.game-active {
+            height: 100vh;
+            height: 100dvh;
+            overflow: hidden !important;
+        }
+        body.game-active footer {
+            display: none !important;
+        }
+        .table-btn-selected {
+            background: linear-gradient(135deg, #8b5cf6 0%, #6366f1 100%);
+            border-color: #a78bfa;
+            color: #ffffff;
+            box-shadow: 0 0 10px rgba(139, 92, 246, 0.5);
+        }
+        .rank-badge-1 {
+            background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+            color: #ffffff;
+            box-shadow: 0 0 12px rgba(245, 158, 11, 0.5);
+        }
+        .rank-badge-2 {
+            background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+            color: #ffffff;
+        }
+        .rank-badge-3 {
+            background: linear-gradient(135deg, #b45309 0%, #78350f 100%);
+            color: #ffffff;
+        }
+        .badges-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+            gap: 12px;
+            margin-top: 12px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col bg-slate-950 text-slate-100 antialiased overflow-x-hidden selection:bg-purple-500 selection:text-white">
+
+    <header class="no-print w-full bg-slate-900/90 border-b border-slate-800 backdrop-blur-md sticky top-0 z-40">
+        <div class="max-w-6xl mx-auto px-4 py-2 sm:py-3 flex items-center justify-between">
+            <div class="flex items-center space-x-3 cursor-pointer" onclick="app.showScreen('setup')">
+                <div class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-500 flex items-center justify-center text-white font-bold text-lg sm:text-xl shadow-lg shadow-purple-500/30">
+                    ×÷
+                </div>
+                <div>
+                    <h1 class="heading-font text-lg sm:text-2xl font-bold tracking-wide bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
+                        MATH SCHOLAR
+                    </h1>
+                    <p class="text-[10px] sm:text-xs text-slate-400 font-medium">Fact Fluency Master</p>
+                </div>
+            </div>
+
+            <div class="flex items-center space-x-2 sm:space-x-3">
+                <button onclick="app.openLeaderboardModal()" class="px-3 py-1.5 rounded-xl bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs sm:text-sm font-semibold flex items-center space-x-1.5 transition-all shadow-sm">
+                    <span>🏆</span>
+                    <span>Top Leaderboard</span>
+                </button>
+                <button onclick="app.toggleSound()" class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-colors" title="Toggle Sound">
+                    <span id="sound-icon-on">🔊</span>
+                    <span id="sound-icon-off" class="hidden">🔇</span>
+                </button>
+                <button id="teacher-btn" onclick="app.accessTeacherZone()" class="hidden px-3 py-1.5 rounded-xl bg-purple-900/40 hover:bg-purple-800/60 text-purple-300 border border-purple-700/50 text-xs sm:text-sm font-semibold flex items-center space-x-1.5 transition-colors">
+                    <span>👩‍🏫</span>
+                    <span class="hidden sm:inline">Teacher Zone</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="max-w-5xl mx-auto px-4 py-3 sm:py-6 flex-1 flex flex-col justify-center w-full overflow-x-hidden">
+
+        <section id="screen-setup" class="space-y-5 sm:space-y-6 animate-pop-in">
+            <div class="glass-card rounded-2xl p-4 sm:p-5 border border-purple-500/30 bg-gradient-to-r from-slate-900/90 via-slate-800/80 to-purple-950/40 shadow-lg">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div class="flex items-center space-x-4">
+                        <div id="active-student-avatar" class="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-purple-600 to-indigo-500 flex items-center justify-center text-3xl shadow-lg border-2 border-purple-400/50">
+                            👨‍🏫
+                        </div>
+                        <div>
+                            <div class="flex items-center space-x-2">
+                                <span class="text-[10px] sm:text-xs font-bold tracking-widest uppercase px-2 py-0.5 rounded bg-purple-500/20 text-purple-300 border border-purple-500/30">Active Scholar</span>
+                                <span id="active-student-rank-pill" class="text-[10px] sm:text-xs font-bold px-2 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40">Rank #1</span>
+                            </div>
+                            <h2 id="active-student-name" class="heading-font text-xl sm:text-2xl font-bold text-white mt-0.5">
+                                Mr. Lee
+                            </h2>
+                            <p class="text-xs text-slate-400 flex items-center space-x-3 mt-1">
+                                <span>🏆 Best: <strong id="active-student-pb" class="text-yellow-400">0 pts</strong></span>
+                                <span>•</span>
+                                <span>🎖️ Badges: <strong id="active-student-badges" class="text-cyan-400">0</strong></span>
+                            </p>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center space-x-2 border-t border-slate-700/50 sm:border-0 pt-3 sm:pt-0 justify-end">
+                        <button onclick="app.openEditMyProfileModal()" class="px-3 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 text-xs font-semibold flex items-center space-x-1.5 transition-all">
+                            <span>✏️</span>
+                            <span>My Profile</span>
+                        </button>
+                        <button onclick="app.openSwitchStudentModal()" class="px-3.5 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-bold shadow-md shadow-purple-600/30 flex items-center space-x-1.5 transition-all">
+                            <span>🔄</span>
+                            <span>Switch Scholar</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-4 sm:p-5 border border-amber-500/30 bg-gradient-to-b from-slate-900/95 via-slate-900/80 to-amber-950/20 shadow-xl space-y-4">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800/80 pb-3">
+                    <div class="flex items-center space-x-2.5">
+                        <div class="w-8 h-8 rounded-lg bg-gradient-to-tr from-amber-500 to-yellow-400 flex items-center justify-center text-slate-950 font-bold text-lg shadow">
+                            🏆
+                        </div>
+                        <div>
+                            <h3 class="heading-font text-base sm:text-lg font-bold text-amber-300 flex items-center space-x-2">
+                                <span>Scholar Hall of Fame</span>
+                                <span class="text-xs bg-amber-500/20 text-amber-200 px-2 py-0.5 rounded-full border border-amber-500/40">Monthly Growth Climbers</span>
+                            </h3>
+                            <p class="text-[11px] text-slate-400">Tracking progress and growth points across missions!</p>
+                        </div>
+                    </div>
+                </div>
+                <div id="leaderboard-widget" class="space-y-2"></div>
+            </div>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-5">
+                <div class="glass-card rounded-2xl p-5 border border-slate-800 space-y-4">
+                    <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                        <h3 class="heading-font text-base sm:text-lg font-bold text-slate-200 flex items-center space-x-2">
+                            <span>1️⃣</span>
+                            <span>Select Operation & Tables</span>
+                        </h3>
+                    </div>
+
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-400 mb-2">Operation Mode</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button onclick="app.setOperation('mult')" id="op-btn-mult" class="py-2.5 px-3 rounded-xl border text-xs sm:text-sm font-bold flex items-center justify-center space-x-1 transition-all bg-purple-600 border-purple-400 text-white">
+                                <span>×</span>
+                                <span>Multiplication</span>
+                            </button>
+                            <button onclick="app.setOperation('div')" id="op-btn-div" class="py-2.5 px-3 rounded-xl border text-xs sm:text-sm font-bold flex items-center justify-center space-x-1 transition-all bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700">
+                                <span>÷</span>
+                                <span>Division</span>
+                            </button>
+                            <button onclick="app.setOperation('mixed')" id="op-btn-mixed" class="py-2.5 px-3 rounded-xl border text-xs sm:text-sm font-bold flex items-center justify-center space-x-1 transition-all bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700">
+                                <span>×÷</span>
+                                <span>Mixed</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="block text-xs font-semibold text-slate-400">
+                                Table Set <span class="text-slate-500">(1st Integer of facts)</span>
+                            </label>
+                            <div class="space-x-2 text-[11px]">
+                                <button onclick="app.selectAllTables()" class="text-purple-400 hover:underline font-semibold">Select All</button>
+                                <span class="text-slate-600">•</span>
+                                <button onclick="app.clearTables()" class="text-slate-400 hover:underline">Clear</button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-4 sm:grid-cols-6 gap-2" id="table-selector-grid"></div>
+                    </div>
+                </div>
+
+                <div class="glass-card rounded-2xl p-5 border border-slate-800 space-y-4 flex flex-col justify-between">
+                    <div class="space-y-4">
+                        <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                            <h3 class="heading-font text-base sm:text-lg font-bold text-slate-200 flex items-center space-x-2">
+                                <span>2️⃣</span>
+                                <span>Timer & Game Rules</span>
+                            </h3>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs font-semibold text-slate-400 mb-2">Time Limits</label>
+                            <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                <button onclick="app.setTimeMode('30')" id="time-btn-30" class="py-2.5 px-2 rounded-xl border text-xs font-bold transition-all bg-slate-800 border-slate-700 text-slate-300">⏱️ 30s Sprint</button>
+                                <button onclick="app.setTimeMode('60')" id="time-btn-60" class="py-2.5 px-2 rounded-xl border text-xs font-bold transition-all bg-purple-600 border-purple-400 text-white">⏱️ 60s Standard</button>
+                                <button onclick="app.setTimeMode('120')" id="time-btn-120" class="py-2.5 px-2 rounded-xl border text-xs font-bold transition-all bg-slate-800 border-slate-700 text-slate-300">⏱️ 120s Endurance</button>
+                                <button onclick="app.setTimeMode('untimed')" id="time-btn-untimed" class="py-2.5 px-2 rounded-xl border text-xs font-bold transition-all bg-slate-800 border-slate-700 text-slate-300">♾️ Untimed</button>
+                            </div>
+
+                            <label class="flex items-center space-x-2 mt-3 cursor-pointer text-xs text-slate-300 bg-slate-900/60 p-2.5 rounded-xl border border-slate-800">
+                                <input type="checkbox" id="toggle-auto-advance" checked onchange="app.toggleAutoAdvance()" class="rounded bg-slate-950 border-slate-700 text-purple-600 focus:ring-0">
+                                <span>⚡ <strong>Auto-Advance:</strong> Automatically submit when answer digits match</span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <button onclick="app.startMission()" class="w-full py-4 rounded-xl bg-gradient-to-r from-scholar-600 via-emerald-500 to-teal-500 hover:from-scholar-500 hover:to-teal-400 text-white font-bold text-lg shadow-xl shadow-scholar-600/30 btn-glow flex items-center justify-center space-x-2">
+                        <span>🚀</span>
+                        <span>START FACT MISSION</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="screen-game" class="hidden flex-1 flex flex-col justify-between py-1 sm:py-3 max-h-[88vh] select-none animate-pop-in">
+            <div class="grid grid-cols-3 items-center bg-slate-900/80 rounded-2xl p-2.5 px-4 border border-slate-800 shadow-md">
+                <div class="flex items-center space-x-2">
+                    <span class="text-slate-400 text-xs font-semibold hidden sm:inline">Score:</span>
+                    <span id="game-score-display" class="heading-font text-xl sm:text-2xl font-bold text-yellow-400">0</span>
+                    <span id="game-streak-tag" class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-amber-500/20 text-amber-300 border border-amber-500/30 hidden">1x Streak</span>
+                </div>
+
+                <div class="text-center">
+                    <div id="game-timer-container" class="inline-flex items-center space-x-1.5 bg-slate-950 px-3 py-1 rounded-xl border border-slate-800">
+                        <span class="text-xs">⏱️</span>
+                        <span id="game-timer-display" class="heading-font text-lg sm:text-xl font-bold text-cyan-400">60s</span>
+                    </div>
+                </div>
+
+                <div class="text-right flex items-center justify-end space-x-3">
+                    <span class="text-xs text-slate-400">Solved: <strong id="game-solved-count" class="text-white">0</strong></span>
+                    <button onclick="app.abortMission()" class="text-xs text-rose-400 hover:text-rose-300 font-semibold px-2 py-1 rounded bg-rose-950/40 border border-rose-800/50">Quit</button>
+                </div>
+            </div>
+
+            <div class="my-auto py-2 sm:py-4 flex flex-col items-center justify-center">
+                <div class="glass-card w-full max-w-md rounded-3xl p-6 border-2 border-purple-500/40 shadow-2xl text-center space-y-4 relative overflow-hidden bg-gradient-to-b from-slate-900 via-slate-900 to-purple-950/30">
+                    <div id="game-feedback-toast" class="absolute inset-x-0 top-0 py-1.5 text-center text-xs font-extrabold uppercase tracking-widest hidden transition-all">
+                        CORRECT! +120 PTS
+                    </div>
+
+                    <div class="pt-2">
+                        <span class="text-xs font-bold uppercase tracking-widest text-purple-400 bg-purple-950/80 px-3 py-1 rounded-full border border-purple-800/50" id="game-fact-tag">
+                            Multiplication Fact
+                        </span>
+                    </div>
+
+                    <div class="flex items-center justify-center space-x-3 my-2 sm:my-4">
+                        <div id="eq-num1" class="heading-font text-5xl sm:text-6xl font-bold text-white tracking-tight">7</div>
+                        <div id="eq-op" class="heading-font text-4xl sm:text-5xl font-bold text-purple-400">×</div>
+                        <div id="eq-num2" class="heading-font text-5xl sm:text-6xl font-bold text-white tracking-tight">8</div>
+                        <div class="heading-font text-4xl sm:text-5xl font-bold text-slate-500">=</div>
+                        <div id="eq-answer-box" class="w-20 sm:w-28 h-16 sm:h-20 bg-slate-950 border-3 border-purple-500 rounded-2xl flex items-center justify-center text-3xl sm:text-4xl font-extrabold text-cyan-300 shadow-inner">
+                            ?
+                        </div>
+                    </div>
+
+                    <div id="question-timer-container" class="pt-1">
+                        <div class="w-full bg-slate-950 rounded-full h-2 overflow-hidden border border-slate-800/80">
+                            <div id="game-progress-bar" class="bg-gradient-to-r from-emerald-400 via-amber-400 to-rose-500 h-full w-full transition-all duration-75 ease-linear origin-left"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="w-full max-w-xs mx-auto space-y-2 pb-2">
+                <div class="grid grid-cols-3 gap-2">
+                    <button onclick="app.keypadInput('1')" class="h-12 sm:h-14 bg-slate-800 hover:bg-slate-700 active:bg-purple-600 text-white font-extrabold text-2xl rounded-xl border border-slate-700 shadow">1</button>
+                    <button onclick="app.keypadInput('2')" class="h-12 sm:h-14 bg-slate-800 hover:bg-slate-700 active:bg-purple-600 text-white font-extrabold text-2xl rounded-xl border border-slate-700 shadow">2</button>
+                    <button onclick="app.keypadInput('3')" class="h-12 sm:h-14 bg-slate-800 hover:bg-slate-700 active:bg-purple-600 text-white font-extrabold text-2xl rounded-xl border border-slate-700 shadow">3</button>
+                    <button onclick="app.keypadInput('4')" class="h-12 sm:h-14 bg-slate-800 hover:bg-slate-700 active:bg-purple-600 text-white font-extrabold text-2xl rounded-xl border border-slate-700 shadow">4</button>
+                    <button onclick="app.keypadInput('5')" class="h-12 sm:h-14 bg-slate-800 hover:bg-slate-700 active:bg-purple-600 text-white font-extrabold text-2xl rounded-xl border border-slate-700 shadow">5</button>
+                    <button onclick="app.keypadInput('6')" class="h-12 sm:h-14 bg-slate-800 hover:bg-slate-700 active:bg-purple-600 text-white font-extrabold text-2xl rounded-xl border border-slate-700 shadow">6</button>
+                    <button onclick="app.keypadInput('7')" class="h-12 sm:h-14 bg-slate-800 hover:bg-slate-700 active:bg-purple-600 text-white font-extrabold text-2xl rounded-xl border border-slate-700 shadow">7</button>
+                    <button onclick="app.keypadInput('8')" class="h-12 sm:h-14 bg-slate-800 hover:bg-slate-700 active:bg-purple-600 text-white font-extrabold text-2xl rounded-xl border border-slate-700 shadow">8</button>
+                    <button onclick="app.keypadInput('9')" class="h-12 sm:h-14 bg-slate-800 hover:bg-slate-700 active:bg-purple-600 text-white font-extrabold text-2xl rounded-xl border border-slate-700 shadow">9</button>
+                    <button onclick="app.keypadClear()" class="h-12 sm:h-14 bg-rose-950/60 hover:bg-rose-900 text-rose-300 font-bold text-lg rounded-xl border border-rose-800/60">⌫</button>
+                    <button onclick="app.keypadInput('0')" class="h-12 sm:h-14 bg-slate-800 hover:bg-slate-700 active:bg-purple-600 text-white font-extrabold text-2xl rounded-xl border border-slate-700 shadow">0</button>
+                    <button onclick="app.submitAnswer()" class="h-12 sm:h-14 bg-scholar-600 hover:bg-scholar-500 text-white font-extrabold text-xl rounded-xl border border-scholar-400 shadow flex items-center justify-center">↵</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="screen-results" class="hidden space-y-6 animate-pop-in">
+            <div class="glass-card rounded-3xl p-6 sm:p-8 border border-purple-500/30 text-center space-y-6 bg-gradient-to-b from-slate-900 via-slate-900 to-purple-950/40">
+                <div>
+                    <span class="text-4xl">🎉</span>
+                    <h2 class="heading-font text-2xl sm:text-4xl font-extrabold text-white mt-2">Mission Complete!</h2>
+                    <p class="text-sm text-slate-400">Great job exercising your fact fluency skills!</p>
+                </div>
+
+                <div id="results-lb-rank-box" class="bg-gradient-to-r from-amber-500/20 via-yellow-500/10 to-amber-500/20 border border-amber-500/40 rounded-2xl p-3 flex items-center justify-between text-xs sm:text-sm">
+                    <div class="flex items-center space-x-2">
+                        <span class="text-2xl">🏆</span>
+                        <div class="text-left">
+                            <div class="font-bold text-amber-300" id="results-lb-rank-title">Ranked #1 in Class Leaderboard!</div>
+                            <div class="text-slate-300 text-[11px]" id="results-lb-rank-subtitle">You earned growth points!</div>
+                        </div>
+                    </div>
+                    <button onclick="app.openLeaderboardModal()" class="px-3 py-1.5 rounded-xl bg-amber-500 text-slate-950 font-bold text-xs hover:bg-amber-400 shadow">
+                        View Leaderboard
+                    </button>
+                </div>
+
+                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                    <div class="bg-slate-950/80 p-3.5 rounded-2xl border border-slate-800">
+                        <div class="text-[11px] text-slate-400 font-semibold">Total Score</div>
+                        <div id="res-score" class="heading-font text-2xl sm:text-3xl font-extrabold text-yellow-400 mt-1">0</div>
+                    </div>
+                    <div class="bg-slate-950/80 p-3.5 rounded-2xl border border-slate-800">
+                        <div class="text-[11px] text-slate-400 font-semibold">Accuracy</div>
+                        <div id="res-accuracy" class="heading-font text-2xl sm:text-3xl font-extrabold text-emerald-400 mt-1">0%</div>
+                    </div>
+                    <div class="bg-slate-950/80 p-3.5 rounded-2xl border border-slate-800">
+                        <div class="text-[11px] text-slate-400 font-semibold">Solved / Total</div>
+                        <div id="res-solved" class="heading-font text-2xl sm:text-3xl font-extrabold text-cyan-400 mt-1">0</div>
+                    </div>
+                    <div class="bg-slate-950/80 p-3.5 rounded-2xl border border-slate-800">
+                        <div class="text-[11px] text-slate-400 font-semibold">Max Streak</div>
+                        <div id="res-streak" class="heading-font text-2xl sm:text-3xl font-extrabold text-amber-400 mt-1">0🔥</div>
+                    </div>
+                </div>
+
+                <div id="results-review-section" class="bg-slate-950/60 p-4 sm:p-5 rounded-2xl border border-slate-700/80 text-left space-y-3 mt-4 hidden">
+                    <h3 class="text-sm sm:text-base font-bold text-slate-200 flex items-center space-x-2 border-b border-slate-800 pb-2">
+                        <span>📝</span>
+                        <span>Facts to Review</span>
+                    </h3>
+                    <div id="review-wrong-list" class="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs"></div>
+                </div>
+
+                <div class="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
+                    <button onclick="app.startMission()" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-sm shadow-lg shadow-purple-600/30 flex items-center justify-center space-x-2">
+                        <span>🔄</span>
+                        <span>Play Again</span>
+                    </button>
+                    <button onclick="app.showScreen('setup')" class="w-full sm:w-auto px-6 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-sm border border-slate-700 flex items-center justify-center space-x-2">
+                        <span>🏠</span>
+                        <span>Main Menu</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section id="screen-teacher" class="hidden space-y-6 animate-pop-in">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-4">
+                <div>
+                    <h2 class="heading-font text-2xl font-bold text-white flex items-center space-x-2">
+                        <span>👩‍🏫</span>
+                        <span>Teacher Dashboard & Class Roster</span>
+                    </h2>
+                    <p class="text-xs text-slate-400">Oversee student profiles and manage class data.</p>
+                </div>
+                <div class="flex items-center space-x-2">
+                    <button onclick="app.openChangePasswordModal()" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-amber-300 text-xs font-semibold border border-amber-500/30 flex items-center space-x-1.5">
+                        <span>🔑</span>
+                        <span>Passcode Settings</span>
+                    </button>
+                    <button onclick="app.showScreen('setup')" class="px-3.5 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700">
+                        ← Back to Practice
+                    </button>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-5 border border-purple-500/30 space-y-5">
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+                    <div>
+                        <h3 class="heading-font text-lg font-bold text-purple-300">Fact Selection</h3>
+                        <p class="text-xs text-slate-400">Select operations and target facts to focus practice, or test run missions.</p>
+                    </div>
+                </div>
+
+                <div class="bg-slate-950/80 p-4 rounded-xl border border-slate-800 space-y-3">
+                    <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                        <div class="flex-1">
+                            <label class="block text-xs font-semibold text-purple-300 mb-1">Target Operation</label>
+                            <select id="teacher-op-select" onchange="app.onTeacherOpChange(this.value)" class="w-full sm:w-64 bg-slate-900 border border-purple-500/50 rounded-xl px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-purple-400 cursor-pointer">
+                                <option value="mult">Multiplication Facts (×)</option>
+                                <option value="div">Division Facts (÷)</option>
+                                <option value="mixed">Mixed Facts (×÷)</option>
+                            </select>
+                        </div>
+                        <div class="flex items-center space-x-2">
+                            <button onclick="app.teacherTestRunSelected()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md flex items-center space-x-1.5 transition-all">
+                                <span>🧪</span>
+                                <span>Start Test Run for Selected Facts</span>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="flex items-center justify-between mb-1.5">
+                            <label class="block text-[11px] font-semibold text-slate-400">
+                                Targeted Fact Sets <span class="text-slate-500">(1s through 12s)</span>
+                            </label>
+                            <div class="space-x-2 text-[11px]">
+                                <button type="button" onclick="app.selectAllTeacherTables()" class="text-purple-400 hover:underline font-semibold">Select All</button>
+                                <span class="text-slate-600">•</span>
+                                <button type="button" onclick="app.clearTeacherTables()" class="text-slate-400 hover:underline">Clear</button>
+                            </div>
+                        </div>
+                        <div class="grid grid-cols-4 sm:grid-cols-6 gap-2" id="teacher-table-grid"></div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="glass-card rounded-2xl p-5 border border-slate-800 space-y-4">
+                <div class="flex items-center justify-between">
+                    <h3 class="heading-font text-lg font-bold text-slate-200">Class Roster & Analytics</h3>
+                    <button onclick="app.openCreateProfileModal()" class="px-3 py-1.5 rounded-xl bg-scholar-600 hover:bg-scholar-500 text-white text-xs font-bold shadow-md flex items-center space-x-1">
+                        <span>➕ Add New Student</span>
+                    </button>
+                </div>
+
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left text-xs text-slate-300">
+                        <thead class="bg-slate-900/90 text-slate-400 uppercase tracking-wider text-[10px]">
+                            <tr>
+                                <th class="p-3">Scholar</th>
+                                <th class="p-3">Missions</th>
+                                <th class="p-3">Personal Best</th>
+                                <th class="p-3">Avg Accuracy</th>
+                                <th class="p-3 text-right">Admin Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teacher-roster-tbody" class="divide-y divide-slate-800">
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="flex justify-end pt-2">
+                <button onclick="app.resetMonthlyGrowth()" class="px-4 py-2 rounded-xl bg-red-600/80 hover:bg-red-600 text-white text-xs font-bold shadow-md transition-all flex items-center space-x-2">
+                    <span>🔄</span>
+                    <span>Reset Monthly Growth Points</span>
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="modal-leaderboard" class="fixed inset-0 bg-slate-950/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card max-w-lg w-full rounded-2xl p-6 border border-amber-500/40 shadow-2xl space-y-5 animate-pop-in bg-slate-900">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="heading-font text-xl font-bold text-amber-300">Monthly Growth Leaderboard</h3>
+                <button onclick="app.closeModal('modal-leaderboard')" class="text-slate-400 hover:text-white font-bold text-lg p-1">✕</button>
+            </div>
+            <div id="modal-leaderboard-container" class="space-y-2.5 max-h-80 overflow-y-auto pr-1"></div>
+            <div class="pt-2 border-t border-slate-800 flex justify-end">
+                <button onclick="app.closeModal('modal-leaderboard')" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 text-xs font-semibold">Close</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-switch-student" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card max-w-md w-full rounded-2xl p-6 border border-slate-700 shadow-2xl space-y-5 animate-pop-in">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="heading-font text-lg font-bold text-white">Select Scholar Profile</h3>
+                <button onclick="app.closeModal('modal-switch-student')" class="text-slate-400 hover:text-white font-bold text-lg p-1">✕</button>
+            </div>
+            <div id="switch-student-list" class="space-y-2.5 max-h-60 overflow-y-auto pr-1"></div>
+            <div class="pt-2 border-t border-slate-800 flex justify-end">
+                <button onclick="app.closeModal('modal-switch-student')" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 text-xs font-semibold">Cancel</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal-edit-my-profile" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card max-w-lg w-full rounded-2xl p-6 border border-slate-700 shadow-2xl space-y-4 animate-pop-in">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="heading-font text-lg font-bold text-white">My Profile</h3>
+                <button onclick="app.closeModal('modal-edit-my-profile')" class="text-slate-400 hover:text-white font-bold text-lg p-1">✕</button>
+            </div>
+            <form onsubmit="app.saveMyProfile(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Scholar Name</label>
+                    <input type="text" id="my-profile-name" required maxlength="20" class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-2">Choose Avatar Icon</label>
+                    <div class="grid grid-cols-5 gap-2" id="my-profile-avatar-options"></div>
+                </div>
+                
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-2">🏅 My Achievements</label>
+                        <div class="h-40 overflow-y-auto pr-2 bg-slate-900/50 p-2.5 rounded-xl border border-slate-800">
+                            <div class="badges-grid !grid-cols-1 gap-2" id="studentBadgesGrid"></div>
+                        </div>
+                    </div>
+                    <div>
+                        <label class="block text-xs font-semibold text-slate-300 mb-2">📊 Last 5 Results</label>
+                        <div class="h-40 overflow-y-auto pr-1 bg-slate-900/50 p-2 rounded-xl border border-slate-800">
+                            <div class="space-y-1.5" id="studentHistoryGrid"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="pt-2 flex justify-end space-x-2">
+                    <button type="button" onclick="app.closeModal('modal-edit-my-profile')" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 text-xs font-semibold">Cancel</button>
+                    <button type="submit" class="px-4 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold shadow-md">Save Changes</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-teacher-edit-student" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card max-w-md w-full rounded-2xl p-6 border border-purple-500/40 shadow-2xl space-y-4 animate-pop-in bg-slate-900">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="heading-font text-lg font-bold text-white">Manage Student Profile</h3>
+                <button onclick="app.closeModal('modal-teacher-edit-student')" class="text-slate-400 hover:text-white font-bold text-lg p-1">✕</button>
+            </div>
+            <form onsubmit="app.saveTeacherStudentProfile(event)" class="space-y-4">
+                <input type="hidden" id="teacher-edit-student-id">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Scholar Name</label>
+                    <input type="text" id="teacher-edit-student-name" required maxlength="25" class="w-full bg-slate-950 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white focus:outline-none focus:border-purple-500">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-2">Avatar Icon</label>
+                    <div class="grid grid-cols-5 gap-2" id="teacher-edit-avatar-options"></div>
+                </div>
+                <div class="p-3 bg-slate-950/60 rounded-xl border border-slate-800 space-y-2">
+                    <label class="block text-xs font-semibold text-slate-300">Profile Actions</label>
+                    <div class="flex items-center space-x-2">
+                        <button type="button" onclick="app.resetCurrentEditingStudentProgress()" class="px-3 py-1.5 rounded-lg bg-amber-500/20 hover:bg-amber-500/30 text-amber-300 border border-amber-500/40 text-xs font-bold transition-all flex items-center space-x-1">
+                            <span>🔄</span>
+                            <span>Reset Progress</span>
+                        </button>
+                        <button type="button" onclick="app.deleteCurrentEditingStudent()" class="px-3 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 text-xs font-bold transition-all flex items-center space-x-1">
+                            <span>🗑️</span>
+                            <span>Delete Profile</span>
+                        </button>
+                    </div>
+                </div>
+                <div class="pt-2 flex justify-end space-x-2">
+                    <button type="button" onclick="app.closeModal('modal-teacher-edit-student')" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 text-xs font-semibold">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold shadow-md">Save Profile</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-teacher-auth" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card max-w-sm w-full rounded-2xl p-6 border border-purple-500/40 shadow-2xl space-y-4 animate-pop-in">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="heading-font text-lg font-bold text-white">Teacher Verification</h3>
+                <button onclick="app.closeModal('modal-teacher-auth')" class="text-slate-400 hover:text-white font-bold text-lg p-1">✕</button>
+            </div>
+            <form onsubmit="app.verifyTeacherPassword(event)" class="space-y-4">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Enter Teacher Passcode</label>
+                    <input type="password" id="teacher-auth-input" placeholder="Passcode" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2.5 text-center text-lg tracking-widest font-bold text-white focus:outline-none focus:border-purple-500">
+                    <p id="teacher-auth-error" class="text-xs text-rose-400 mt-1.5 hidden font-semibold text-center">Incorrect passcode. Default is 1234.</p>
+                    <p class="text-[11px] text-slate-400 mt-1.5 text-center">Default passcode: <strong class="text-purple-300">1234</strong></p>
+                </div>
+                <div class="pt-2 flex justify-end space-x-2">
+                    <button type="button" onclick="app.closeModal('modal-teacher-auth')" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 text-xs font-semibold">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold shadow-md">Unlock Zone 🔓</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-change-password" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card max-w-sm w-full rounded-2xl p-6 border border-amber-500/40 shadow-2xl space-y-4 animate-pop-in">
+            <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+                <h3 class="heading-font text-lg font-bold text-white">Change Passcode</h3>
+                <button onclick="app.closeModal('modal-change-password')" class="text-slate-400 hover:text-white font-bold text-lg p-1">✕</button>
+            </div>
+            <form onsubmit="app.saveNewTeacherPassword(event)" class="space-y-3">
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">Current Passcode</label>
+                    <input type="password" id="pass-current-input" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-semibold text-slate-300 mb-1">New Passcode</label>
+                    <input type="password" id="pass-new-input" required class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-sm text-white">
+                </div>
+                <div class="pt-2 flex justify-end space-x-2">
+                    <button type="button" onclick="app.closeModal('modal-change-password')" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 text-xs font-semibold">Cancel</button>
+                    <button type="submit" class="px-5 py-2 rounded-xl bg-amber-600 hover:bg-amber-500 text-white text-xs font-bold">Update</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <div id="modal-confirm" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="glass-card max-w-sm w-full rounded-2xl p-6 border border-slate-700 shadow-2xl space-y-4 animate-pop-in">
+            <h3 class="heading-font text-lg font-bold text-white" id="confirm-title">Are you sure?</h3>
+            <p class="text-xs text-slate-300" id="confirm-message">This action cannot be undone.</p>
+            <div class="pt-2 flex justify-end space-x-2">
+                <button id="confirm-cancel-btn" class="px-4 py-2 rounded-xl bg-slate-800 text-slate-300 hover:bg-slate-700 text-xs font-semibold">Cancel</button>
+                <button id="confirm-ok-btn" class="px-4 py-2 rounded-xl bg-rose-600 hover:bg-rose-500 text-white text-xs font-bold">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="app-notification-toast" class="fixed bottom-5 right-5 z-50 hidden bg-slate-900 border border-purple-500 text-white text-xs px-4 py-3 rounded-xl shadow-2xl flex items-center space-x-2 animate-pop-in">
+        <span id="toast-icon">ℹ️</span>
+        <span id="toast-message">Notification message</span>
+    </div>
+
+    <script>
+        class AudioEngine {
+            constructor() {
+                this.ctx = null;
+                this.enabled = true;
+            }
+            init() {
+                try {
+                    if (!this.ctx) {
+                        const AudioContext = window.AudioContext || window.webkitAudioContext;
+                        if (AudioContext) this.ctx = new AudioContext();
+                    }
+                    if (this.ctx && this.ctx.state === 'suspended') {
+                        this.ctx.resume().catch(e => console.warn("Audio resume pending user gesture.", e));
+                    }
+                } catch (e) {
+                    console.warn("Web Audio API unavailable.", e);
+                }
+            }
+            playCorrect() {
+                if (!this.enabled) return;
+                this.init();
+                if (!this.ctx) return;
+                try {
+                    const now = this.ctx.currentTime;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sine';
+                    osc.frequency.setValueAtTime(523.25, now);
+                    osc.frequency.exponentialRampToValueAtTime(783.99, now + 0.2);
+                    gain.gain.setValueAtTime(0.15, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.35);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.35);
+                } catch (e) { console.warn("Audio play error", e); }
+            }
+            playWrong() {
+                if (!this.enabled) return;
+                this.init();
+                if (!this.ctx) return;
+                try {
+                    const now = this.ctx.currentTime;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'sawtooth';
+                    osc.frequency.setValueAtTime(180, now);
+                    osc.frequency.linearRampToValueAtTime(110, now + 0.25);
+                    gain.gain.setValueAtTime(0.2, now);
+                    gain.gain.exponentialRampToValueAtTime(0.01, now + 0.25);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.25);
+                } catch (e) { console.warn("Audio play error", e); }
+            }
+            playClick() {
+                if (!this.enabled) return;
+                this.init();
+                if (!this.ctx) return;
+                try {
+                    const now = this.ctx.currentTime;
+                    const osc = this.ctx.createOscillator();
+                    const gain = this.ctx.createGain();
+                    osc.type = 'triangle';
+                    osc.frequency.setValueAtTime(400, now);
+                    gain.gain.setValueAtTime(0.05, now);
+                    gain.gain.exponentialRampToValueAtTime(0.001, now + 0.05);
+                    osc.connect(gain);
+                    gain.connect(this.ctx.destination);
+                    osc.start(now);
+                    osc.stop(now + 0.05);
+                } catch (e) { console.warn("Audio play error", e); }
+            }
+        }
+
+        const AVATARS = ['🎓', '🚀', '🦁', '🦉', '🦊', '🐱', '🤖', '👑', '⚡', '🌟', '👨‍🏫'];
+        const GOOGLE_SHEET_URL = 'https://script.google.com/macros/s/AKfycbzsGDxg7rdr1ZKj75txYoIKZ8ewMLL5-7w2jNpeD31czajGltvwAvF6Y_ZcH10lARz0Uw/exec';
+
+        const defaultProfiles = [
+            { id: '1', name: 'Mr. Lee', avatar: '👨‍🏫', history: [], pb: 0, growthPoints: 0, badges: ['First Step'], missionsCompleted: 0, avgAccuracy: 0 },
+            { id: '2', name: 'Aliya', avatar: '🚀', history: [], pb: 0, growthPoints: 0, badges: ['First Step'], missionsCompleted: 0, avgAccuracy: 0 },
+            { id: '3', name: 'Floyd', avatar: '🦁', history: [], pb: 0, growthPoints: 0, badges: ['First Step'], missionsCompleted: 0, avgAccuracy: 0 },
+            { id: '4', name: 'Alex', avatar: '🦉', history: [], pb: 0, growthPoints: 0, badges: ['First Step'], missionsCompleted: 0, avgAccuracy: 0 },
+            { id: '5', name: 'Dulce', avatar: '🦊', history: [], pb: 0, growthPoints: 0, badges: ['First Step'], missionsCompleted: 0, avgAccuracy: 0 },
+            { id: '6', name: 'Riley', avatar: '🐱', history: [], pb: 0, growthPoints: 0, badges: ['First Step'], missionsCompleted: 0, avgAccuracy: 0 },
+            { id: '7', name: 'Jasmine', avatar: '🤖', history: [], pb: 0, growthPoints: 0, badges: ['First Step'], missionsCompleted: 0, avgAccuracy: 0 },
+            { id: '8', name: 'Ileana', avatar: '👑', history: [], pb: 0, growthPoints: 0, badges: ['First Step'], missionsCompleted: 0, avgAccuracy: 0 },
+            { id: '9', name: 'Gracie', avatar: '⚡', history: [], pb: 0, growthPoints: 0, badges: ['First Step'], missionsCompleted: 0, avgAccuracy: 0 },
+            { id: '10', name: 'Linkin', avatar: '🌟', history: [], pb: 0, growthPoints: 0, badges: ['First Step'], missionsCompleted: 0, avgAccuracy: 0 },
+            { id: '11', name: 'Jada', avatar: '🎓', history: [], pb: 0, growthPoints: 0, badges: ['First Step'], missionsCompleted: 0, avgAccuracy: 0 },
+            { id: '12', name: 'Leium', avatar: '🚀', history: [], pb: 0, growthPoints: 0, badges: ['First Step'], missionsCompleted: 0, avgAccuracy: 0 },
+            { id: '13', name: 'Isabelle', avatar: '🦁', history: [], pb: 0, growthPoints: 0, badges: ['First Step'], missionsCompleted: 0, avgAccuracy: 0 },
+            { id: '14', name: 'Ryan', avatar: '🦉', history: [], pb: 0, growthPoints: 0, badges: ['First Step'], missionsCompleted: 0, avgAccuracy: 0 },
+            { id: '15', name: 'Abraham', avatar: '🦊', history: [], pb: 0, growthPoints: 0, badges: ['First Step'], missionsCompleted: 0, avgAccuracy: 0 },
+            { id: '16', name: 'Aria', avatar: '🐱', history: [], pb: 0, growthPoints: 0, badges: ['First Step'], missionsCompleted: 0, avgAccuracy: 0 },
+            { id: '17', name: 'Blake', avatar: '🤖', history: [], pb: 0, growthPoints: 0, badges: ['First Step'], missionsCompleted: 0, avgAccuracy: 0 },
+            { id: '18', name: 'Charlotte', avatar: '👑', history: [], pb: 0, growthPoints: 0, badges: ['First Step'], missionsCompleted: 0, avgAccuracy: 0 },
+            { id: '19', name: 'Lylah', avatar: '⚡', history: [], pb: 0, growthPoints: 0, badges: ['First Step'], missionsCompleted: 0, avgAccuracy: 0 },
+            { id: '20', name: 'Juliette', avatar: '🌟', history: [], pb: 0, growthPoints: 0, badges: ['First Step'], missionsCompleted: 0, avgAccuracy: 0 },
+            { id: '21', name: 'Heleina', avatar: '🎓', history: [], pb: 0, growthPoints: 0, badges: ['First Step'], missionsCompleted: 0, avgAccuracy: 0 },
+            { id: '22', name: 'Marilyn', avatar: '🚀', history: [], pb: 0, growthPoints: 0, badges: ['First Step'], missionsCompleted: 0, avgAccuracy: 0 },
+            { id: '23', name: 'Peyton', avatar: '🦁', history: [], pb: 0, growthPoints: 0, badges: ['First Step'], missionsCompleted: 0, avgAccuracy: 0 },
+            { id: '24', name: 'Adalisse', avatar: '🦉', history: [], pb: 0, growthPoints: 0, badges: ['First Step'], missionsCompleted: 0, avgAccuracy: 0 },
+            { id: '25', name: 'Eric', avatar: '🦊', history: [], pb: 0, growthPoints: 0, badges: ['First Step'], missionsCompleted: 0, avgAccuracy: 0 },
+            { id: '26', name: 'Athena', avatar: '🐱', history: [], pb: 0, growthPoints: 0, badges: ['First Step'], missionsCompleted: 0, avgAccuracy: 0 },
+            { id: '27', name: 'Skylar', avatar: '🤖', history: [], pb: 0, growthPoints: 0, badges: ['First Step'], missionsCompleted: 0, avgAccuracy: 0 },
+            { id: '28', name: 'Mia', avatar: '👑', history: [], pb: 0, growthPoints: 0, badges: ['First Step'], missionsCompleted: 0, avgAccuracy: 0 }
+        ];
+
+        class MathScholarApp {
+            constructor() {
+                this.audio = new AudioEngine();
+                
+                this.teacherPassword = this.safeGetStorage('ms_teacher_password', '1234');
+                this.isTeacherAuthenticated = false;
+
+                this.profiles = defaultProfiles;
+                this.safeSetStorage('ms_profiles', this.profiles);
+                this.activeProfileId = '1';
+                this.safeSetStorage('ms_active_profile', '1');
+
+                this.selectedAvatar = '👨‍🏫';
+                this.teacherSelectedAvatar = '👨‍🏫';
+
+                this.selectedOp = 'mult';
+                this.selectedTables = [2, 3, 4, 5];
+                this.timeMode = '60';
+                this.autoAdvance = true;
+
+                this.questionPool = [];
+                this.currentQuestion = null;
+                this.currentInput = '';
+                this.score = 0;
+                this.streak = 0;
+                this.maxStreak = 0;
+                this.solvedCount = 0;
+                this.correctCount = 0;
+                this.wrongCount = 0;
+                this.timer = null;
+                this.timeRemaining = 60;
+                this.questionTimer = null;
+                this.autoSubmitTimer = null;
+                this.wrongFactsList = [];
+                this.isSubmitting = false;
+
+                this.initApp();
+            }
+
+            escapeHtml(str) {
+                if (!str) return '';
+                return String(str)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#039;');
+            }
+
+            safeGetStorage(key, fallback) {
+                try {
+                    const item = localStorage.getItem(key);
+                    return item ? JSON.parse(item) : fallback;
+                } catch (e) {
+                    console.warn(`Storage read failed for ${key}`, e);
+                    return fallback;
+                }
+            }
+
+            safeSetStorage(key, value) {
+                try {
+                    localStorage.setItem(key, typeof value === 'string' ? value : JSON.stringify(value));
+                } catch (e) {
+                    console.warn(`Storage write failed for ${key}`, e);
+                }
+            }
+
+            clearAllTimers() {
+                if (this.timer) { clearInterval(this.timer); this.timer = null; }
+                if (this.questionTimer) { clearTimeout(this.questionTimer); this.questionTimer = null; }
+                if (this.autoSubmitTimer) { clearTimeout(this.autoSubmitTimer); this.autoSubmitTimer = null; }
+            }
+
+            initApp() {
+                this.ensureActiveProfile();
+                this.renderTableSelector();
+                this.updateActiveScholarUI();
+                this.renderLeaderboardWidget();
+
+                this.fetchCloudLeaderboard();
+                setInterval(() => {
+                    if (!document.hidden) this.fetchCloudLeaderboard();
+                }, 60000);
+
+                document.addEventListener('click', () => this.closeAllActionMenus());
+
+                window.addEventListener('keydown', (e) => {
+                    if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.tagName === 'SELECT') {
+                        return;
+                    }
+
+                    if (e.ctrlKey && e.shiftKey && (e.key === '8' || e.key === '*' || e.code === 'Digit8' || e.code === 'Numpad8')) {
+                        e.preventDefault();
+                        this.accessTeacherZone();
+                        return;
+                    }
+
+                    const gameScreen = document.getElementById('screen-game');
+                    if (gameScreen && !gameScreen.classList.contains('hidden')) {
+                        if (e.key >= '0' && e.key <= '9') {
+                            this.keypadInput(e.key);
+                        } else if (e.key === 'Backspace') {
+                            this.keypadClear();
+                        } else if (e.key === 'Enter') {
+                            this.submitAnswer();
+                        }
+                    }
+                });
+            }
+
+            async sendScoreToCloud(score, accuracy, op) {
+                const currentProfile = this.getActiveProfile();
+                if (!currentProfile) return;
+
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+                    await fetch(GOOGLE_SHEET_URL, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ 
+                            name: currentProfile.name, 
+                            score: score, 
+                            accuracy: accuracy, 
+                            op: op 
+                        }),
+                        signal: controller.signal
+                    });
+                    clearTimeout(timeoutId);
+                } catch(err) {
+                    console.warn("Cloud log network error...", err);
+                }
+            }
+
+            async fetchCloudLeaderboard() {
+                try {
+                    const controller = new AbortController();
+                    const timeoutId = setTimeout(() => controller.abort(), 5000);
+
+                    const response = await fetch(GOOGLE_SHEET_URL, { signal: controller.signal });
+                    clearTimeout(timeoutId);
+
+                    if (!response.ok) return;
+                    const cloudLeaderboard = await response.json();
+                    
+                    if (Array.isArray(cloudLeaderboard) && cloudLeaderboard.length > 0) {
+                        cloudLeaderboard.forEach(item => {
+                            let profile = this.profiles.find(p => p.name === item.name);
+                            if (profile) {
+                                profile.growthPoints = item.growthPoints;
+                            } else {
+                                this.profiles.push({
+                                    id: String(Date.now() + Math.random()),
+                                    name: item.name,
+                                    avatar: '🎓',
+                                    growthPoints: item.growthPoints,
+                                    pb: item.growthPoints * 10,
+                                    history: [],
+                                    badges: ['First Step'],
+                                    missionsCompleted: 1,
+                                    avgAccuracy: item.accuracy || 80
+                                });
+                            }
+                        });
+                        this.safeSetStorage('ms_profiles', this.profiles);
+                        this.renderLeaderboardWidget();
+                        this.updateActiveScholarUI();
+                    }
+                } catch(err) {
+                    console.warn("Leaderboard sync error...", err);
+                }
+            }
+
+            showScreen(screenId) {
+                ['screen-setup', 'screen-game', 'screen-results', 'screen-teacher'].forEach(id => {
+                    const el = document.getElementById(id);
+                    if (el) el.classList.add('hidden');
+                });
+                const target = document.getElementById(`screen-${screenId}`);
+                if (target) target.classList.remove('hidden');
+
+                if (screenId === 'game') {
+                    document.body.classList.add('game-active');
+                } else {
+                    document.body.classList.remove('game-active');
+                    this.clearAllTimers();
+                }
+
+                if (screenId === 'teacher') {
+                    this.renderTeacherDashboard();
+                } else if (screenId === 'setup') {
+                    this.updateActiveScholarUI();
+                    this.renderLeaderboardWidget();
+                }
+            }
+
+            closeModal(modalId) {
+                const modal = document.getElementById(modalId);
+                if (modal) modal.classList.add('hidden');
+            }
+
+            showToast(message, icon = 'ℹ️') {
+                const toast = document.getElementById('app-notification-toast');
+                if (!toast) return;
+                document.getElementById('toast-message').textContent = message;
+                document.getElementById('toast-icon').textContent = icon;
+                toast.classList.remove('hidden');
+                setTimeout(() => toast.classList.add('hidden'), 3000);
+            }
+
+            showConfirm(title, message, onConfirm) {
+                document.getElementById('confirm-title').textContent = title;
+                document.getElementById('confirm-message').textContent = message;
+                const modal = document.getElementById('modal-confirm');
+                const okBtn = document.getElementById('confirm-ok-btn');
+                const cancelBtn = document.getElementById('confirm-cancel-btn');
+
+                const cleanup = () => {
+                    modal.classList.add('hidden');
+                    okBtn.onclick = null;
+                    cancelBtn.onclick = null;
+                };
+
+                okBtn.onclick = () => {
+                    cleanup();
+                    onConfirm();
+                };
+                cancelBtn.onclick = cleanup;
+                modal.classList.remove('hidden');
+            }
+
+            ensureActiveProfile() {
+                let current = this.profiles.find(p => p.id === this.activeProfileId);
+                if (!current && this.profiles.length > 0) {
+                    this.activeProfileId = this.profiles[0].id;
+                    current = this.profiles[0];
+                }
+                return current;
+            }
+
+            getActiveProfile() {
+                return this.ensureActiveProfile();
+            }
+
+            getStudentRank(studentId) {
+                const sorted = [...this.profiles].sort((a, b) => (b.growthPoints || 0) - (a.growthPoints || 0));
+                const idx = sorted.findIndex(r => r.id === studentId);
+                return idx >= 0 ? idx + 1 : 1;
+            }
+
+            renderLeaderboardWidget() {
+                const container = document.getElementById('leaderboard-widget');
+                if (!container) return;
+
+                const sorted = [...this.profiles].sort((a, b) => (b.growthPoints || 0) - (a.growthPoints || 0)).slice(0, 5);
+                container.innerHTML = sorted.map((p, index) => {
+                    const isCurrent = p.id === this.activeProfileId;
+                    const rankEmoji = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : `#${index + 1}`;
+                    return `
+                        <div class="flex items-center justify-between p-2.5 rounded-xl border ${isCurrent ? 'bg-purple-950/40 border-purple-500/50' : 'bg-slate-800/40 border-slate-700/30'}">
+                            <div class="flex items-center space-x-3">
+                                <span class="text-base font-bold w-6 text-center">${rankEmoji}</span>
+                                <span class="text-2xl">${p.avatar}</span>
+                                <div>
+                                    <div class="font-bold text-xs text-white">${this.escapeHtml(p.name)}</div>
+                                    <div class="text-[10px] text-slate-400">PB: ${p.pb || 0} pts</div>
+                                </div>
+                            </div>
+                            <div class="text-right">
+                                <span class="text-xs font-bold text-green-400">+${p.growthPoints || 0} pts</span>
+                                <div class="text-[9px] text-slate-400">growth</div>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            openLeaderboardModal() {
+                const container = document.getElementById('modal-leaderboard-container');
+                const sorted = [...this.profiles].sort((a, b) => (b.growthPoints || 0) - (a.growthPoints || 0));
+                container.innerHTML = sorted.map((p, idx) => `
+                    <div class="p-3 rounded-xl border bg-slate-950/80 border-slate-800 flex items-center justify-between">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-xl font-bold">${idx === 0 ? '🥇' : idx === 1 ? '🥈' : idx === 2 ? '🥉' : `#${idx + 1}`}</span>
+                            <span class="text-2xl">${p.avatar}</span>
+                            <span class="font-bold text-sm text-white">${this.escapeHtml(p.name)}</span>
+                        </div>
+                        <div class="text-right text-yellow-400 font-bold">+${p.growthPoints || 0} growth</div>
+                    </div>
+                `).join('');
+                document.getElementById('modal-leaderboard').classList.remove('hidden');
+            }
+
+            updateActiveScholarUI() {
+                const profile = this.getActiveProfile();
+                if (!profile) return;
+                document.getElementById('active-student-avatar').textContent = profile.avatar;
+                document.getElementById('active-student-name').textContent = profile.name;
+                document.getElementById('active-student-pb').textContent = `${profile.pb || 0} pts`;
+                document.getElementById('active-student-badges').textContent = profile.badges ? profile.badges.length : 0;
+                document.getElementById('active-student-rank-pill').textContent = `Rank #${this.getStudentRank(profile.id)}`;
+            }
+
+            renderTableSelector() {
+                const grid = document.getElementById('table-selector-grid');
+                if (!grid) return;
+                grid.innerHTML = '';
+                for (let i = 1; i <= 12; i++) {
+                    const isSelected = this.selectedTables.includes(i);
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+                    btn.className = `py-2 rounded-xl text-xs sm:text-sm font-bold border transition-all ${
+                        isSelected ? 'table-btn-selected' : 'bg-slate-900 border-slate-800 text-slate-300 hover:bg-slate-800'
+                    }`;
+                    btn.textContent = `${i}s`;
+                    btn.onclick = () => this.toggleTable(i);
+                    grid.appendChild(btn);
+                }
+            }
+
+            resetMonthlyGrowth() {
+                this.showConfirm(
+                    "Reset Monthly Growth?",
+                    "Are you sure you want to reset all students' growth points for the new month?",
+                    () => {
+                        this.profiles.forEach(p => { p.growthPoints = 0; });
+                        this.safeSetStorage('ms_profiles', this.profiles);
+                        this.renderLeaderboardWidget();
+                        this.updateActiveScholarUI();
+                        this.showToast("Monthly growth points reset!", "✅");
+                    }
+                );
+            }
+
+            toggleTable(num) {
+                this.audio.playClick();
+                if (this.selectedTables.includes(num)) {
+                    if (this.selectedTables.length > 1) this.selectedTables = this.selectedTables.filter(t => t !== num);
+                } else {
+                    this.selectedTables.push(num);
+                    this.selectedTables.sort((a, b) => a - b);
+                }
+                this.renderTableSelector();
+            }
+
+            selectAllTables() {
+                this.audio.playClick();
+                this.selectedTables = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+                this.renderTableSelector();
+            }
+
+            clearTables() {
+                this.audio.playClick();
+                this.selectedTables = [2];
+                this.renderTableSelector();
+            }
+
+            setOperation(op) {
+                this.audio.playClick();
+                this.selectedOp = op;
+                ['mult', 'div', 'mixed'].forEach(o => {
+                    const btn = document.getElementById(`op-btn-${o}`);
+                    if (btn) {
+                        btn.className = o === op 
+                            ? 'py-2.5 px-3 rounded-xl border text-xs sm:text-sm font-bold flex items-center justify-center space-x-1 transition-all bg-purple-600 border-purple-400 text-white shadow-md'
+                            : 'py-2.5 px-3 rounded-xl border text-xs sm:text-sm font-bold flex items-center justify-center space-x-1 transition-all bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700';
+                    }
+                });
+            }
+
+            setTimeMode(mode) {
+                this.audio.playClick();
+                this.timeMode = mode;
+                ['30', '60', '120', 'untimed'].forEach(m => {
+                    const btn = document.getElementById(`time-btn-${m}`);
+                    if (btn) {
+                        btn.className = m === mode 
+                            ? 'py-2.5 px-2 rounded-xl border text-xs font-bold transition-all bg-purple-600 border-purple-400 text-white shadow-md'
+                            : 'py-2.5 px-2 rounded-xl border text-xs font-bold transition-all bg-slate-800 border-slate-700 text-slate-300 hover:bg-slate-700';
+                    }
+                });
+            }
+
+            toggleAutoAdvance() {
+                const toggle = document.getElementById('toggle-auto-advance');
+                if (toggle) this.autoAdvance = toggle.checked;
+            }
+
+            toggleSound() {
+                this.audio.enabled = !this.audio.enabled;
+                document.getElementById('sound-icon-on').classList.toggle('hidden', !this.audio.enabled);
+                document.getElementById('sound-icon-off').classList.toggle('hidden', this.audio.enabled);
+            }
+
+            startMission() {
+                this.audio.playClick();
+                this.score = 0;
+                this.streak = 0;
+                this.maxStreak = 0;
+                this.solvedCount = 0;
+                this.correctCount = 0;
+                this.wrongCount = 0;
+                this.currentInput = '';
+                this.wrongFactsList = [];
+                this.isSubmitting = false;
+
+                document.getElementById('game-score-display').textContent = '0';
+                document.getElementById('game-solved-count').textContent = '0';
+                document.getElementById('game-streak-tag').classList.add('hidden');
+
+                this.generateQuestionPool();
+
+                if (this.timeMode === 'untimed') {
+                    document.getElementById('game-timer-display').textContent = '♾️';
+                } else {
+                    this.timeRemaining = parseInt(this.timeMode, 10) || 60;
+                    document.getElementById('game-timer-display').textContent = `${this.timeRemaining}s`;
+                    this.startTimer();
+                }
+
+                this.showScreen('game');
+                this.nextQuestion();
+            }
+
+            generateQuestionPool() {
+                this.questionPool = [];
+                const factors = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
+                this.selectedTables.forEach(t => {
+                    factors.forEach(f => {
+                        if (this.selectedOp === 'mult' || this.selectedOp === 'mixed') {
+                            this.questionPool.push({ num1: t, op: '×', num2: f, answer: t * f, tag: `${t}s Multiplication` });
+                        }
+                        if (this.selectedOp === 'div' || this.selectedOp === 'mixed') {
+                            const product = t * f;
+                            this.questionPool.push({ num1: product, op: '÷', num2: t, answer: f, tag: `${t}s Division` });
+                        }
+                    });
+                });
+                this.questionPool.sort(() => Math.random() - 0.5);
+            }
+
+            nextQuestion() {
+                if (this.autoSubmitTimer) {
+                    clearTimeout(this.autoSubmitTimer);
+                    this.autoSubmitTimer = null;
+                }
+                if (this.questionPool.length === 0) this.generateQuestionPool();
+                this.currentQuestion = this.questionPool.pop();
+                this.currentInput = '';
+                this.isSubmitting = false;
+
+                document.getElementById('eq-num1').textContent = this.currentQuestion.num1;
+                document.getElementById('eq-op').textContent = this.currentQuestion.op;
+                document.getElementById('eq-num2').textContent = this.currentQuestion.num2;
+                document.getElementById('eq-answer-box').textContent = '?';
+                document.getElementById('game-fact-tag').textContent = this.currentQuestion.tag;
+
+                this.resetQuestionBar();
+            }
+
+            resetQuestionBar() {
+                if (this.questionTimer) clearTimeout(this.questionTimer);
+
+                const progressBar = document.getElementById('game-progress-bar');
+                if (progressBar) {
+                    progressBar.style.transition = 'none';
+                    progressBar.style.width = '100%';
+                    setTimeout(() => {
+                        progressBar.style.transition = 'width 5s linear';
+                        progressBar.style.width = '0%';
+                    }, 50);
+                }
+
+                this.questionTimer = setTimeout(() => {
+                    const gameScreen = document.getElementById('screen-game');
+                    if (gameScreen && !gameScreen.classList.contains('hidden')) {
+                        this.handleQuestionTimeout();
+                    }
+                }, 5000);
+            }
+
+            handleQuestionTimeout() {
+                this.audio.playWrong();
+                this.wrongCount++;
+                this.solvedCount++;
+                this.streak = 0;
+                this.wrongFactsList.push(`${this.currentQuestion.num1} ${this.currentQuestion.op} ${this.currentQuestion.num2} = ${this.currentQuestion.answer}`);
+
+                const toast = document.getElementById('game-feedback-toast');
+                toast.textContent = `TIME OUT! Answer was ${this.currentQuestion.answer}`;
+                toast.className = 'absolute inset-x-0 top-0 py-1.5 text-center text-xs font-extrabold uppercase tracking-widest bg-rose-500 text-white animate-pop-in';
+                toast.classList.remove('hidden');
+                setTimeout(() => toast.classList.add('hidden'), 600);
+
+                document.getElementById('game-score-display').textContent = this.score;
+                document.getElementById('game-solved-count').textContent = this.solvedCount;
+                document.getElementById('game-streak-tag').classList.add('hidden');
+
+                this.nextQuestion();
+            }
+
+            startTimer() {
+                if (this.timer) clearInterval(this.timer);
+                this.timer = setInterval(() => {
+                    this.timeRemaining--;
+                    document.getElementById('game-timer-display').textContent = `${this.timeRemaining}s`;
+                    if (this.timeRemaining <= 0) {
+                        this.clearAllTimers();
+                        this.endMission();
+                    }
+                }, 1000);
+            }
+
+            keypadInput(digit) {
+                this.audio.playClick();
+                if (this.currentInput.length < 4) {
+                    this.currentInput += digit;
+                    document.getElementById('eq-answer-box').textContent = this.currentInput;
+
+                    const expectedLength = String(this.currentQuestion.answer).length;
+                    if (this.autoAdvance && this.currentInput.length >= expectedLength) {
+                        if (this.autoSubmitTimer) clearTimeout(this.autoSubmitTimer);
+                        this.autoSubmitTimer = setTimeout(() => {
+                            if (this.currentInput !== '') {
+                                this.submitAnswer();
+                            }
+                        }, 120);
+                    }
+                }
+            }
+
+            keypadClear() {
+                this.audio.playClick();
+                if (this.autoSubmitTimer) clearTimeout(this.autoSubmitTimer);
+                this.currentInput = '';
+                document.getElementById('eq-answer-box').textContent = '?';
+            }
+
+            submitAnswer() {
+                if (this.isSubmitting || !this.currentInput) return;
+                this.isSubmitting = true;
+
+                if (this.questionTimer) clearTimeout(this.questionTimer);
+                if (this.autoSubmitTimer) clearTimeout(this.autoSubmitTimer);
+
+                const userAns = parseInt(this.currentInput, 10);
+                this.solvedCount++;
+
+                const toast = document.getElementById('game-feedback-toast');
+
+                if (userAns === this.currentQuestion.answer) {
+                    this.audio.playCorrect();
+                    this.correctCount++;
+                    this.streak++;
+                    if (this.streak > this.maxStreak) this.maxStreak = this.streak;
+
+                    const pts = 100 + (this.streak > 1 ? Math.min(this.streak * 10, 50) : 0);
+                    this.score += pts;
+
+                    toast.textContent = `CORRECT! +${pts} PTS`;
+                    toast.className = 'absolute inset-x-0 top-0 py-1.5 text-center text-xs font-extrabold uppercase tracking-widest bg-emerald-500 text-slate-950 animate-pop-in';
+                } else {
+                    this.audio.playWrong();
+                    this.wrongCount++;
+                    this.streak = 0;
+                    this.wrongFactsList.push(`${this.currentQuestion.num1} ${this.currentQuestion.op} ${this.currentQuestion.num2} = ${this.currentQuestion.answer}`);
+
+                    toast.textContent = `MISSED! Answer was ${this.currentQuestion.answer}`;
+                    toast.className = 'absolute inset-x-0 top-0 py-1.5 text-center text-xs font-extrabold uppercase tracking-widest bg-rose-500 text-white animate-pop-in';
+                }
+
+                toast.classList.remove('hidden');
+                setTimeout(() => toast.classList.add('hidden'), 600);
+
+                document.getElementById('game-score-display').textContent = this.score;
+                document.getElementById('game-solved-count').textContent = this.solvedCount;
+
+                const streakTag = document.getElementById('game-streak-tag');
+                if (this.streak >= 2) {
+                    streakTag.textContent = `${this.streak}x Streak!`;
+                    streakTag.classList.remove('hidden');
+                } else {
+                    streakTag.classList.add('hidden');
+                }
+
+                this.nextQuestion();
+            }
+
+            evaluateBadges(profile, accuracy) {
+                if (!profile.badges) profile.badges = [];
+                const newBadges = [];
+
+                if (!profile.badges.includes('First Step')) newBadges.push('First Step');
+                if (accuracy === 100 && this.solvedCount >= 5 && !profile.badges.includes('Perfect Score')) newBadges.push('Perfect Score');
+                if (this.maxStreak >= 10 && !profile.badges.includes('Streak Master')) newBadges.push('Streak Master');
+                if (this.score >= 800 && !profile.badges.includes('Speed Thinker')) newBadges.push('Speed Thinker');
+
+                newBadges.forEach(b => {
+                    if (!profile.badges.includes(b)) {
+                        profile.badges.push(b);
+                        this.showToast(`Badge Unlocked: ${b}!`, '🏅');
+                    }
+                });
+            }
+
+            abortMission() {
+                this.clearAllTimers();
+                this.showScreen('setup');
+            }
+
+            endMission() {
+                this.clearAllTimers();
+
+                const profile = this.getActiveProfile();
+                const accuracy = this.solvedCount > 0 ? Math.round((this.correctCount / this.solvedCount) * 100) : 0;
+
+                if (!profile.pb || this.score > profile.pb) {
+                    profile.pb = this.score;
+                }
+                const earnedGrowth = Math.round(this.score / 10);
+                profile.growthPoints = (profile.growthPoints || 0) + earnedGrowth;
+                profile.missionsCompleted = (profile.missionsCompleted || 0) + 1;
+                profile.avgAccuracy = profile.avgAccuracy ? Math.round((profile.avgAccuracy + accuracy) / 2) : accuracy;
+
+                this.evaluateBadges(profile, accuracy);
+
+                if (!profile.history) profile.history = [];
+                profile.history.unshift({
+                    score: this.score,
+                    accuracy: accuracy,
+                    op: this.selectedOp === 'mult' ? '× Mult' : this.selectedOp === 'div' ? '÷ Div' : '×÷ Mixed',
+                    date: new Date().toLocaleDateString(undefined, { month: 'short', day: 'numeric' }),
+                    solved: `${this.correctCount}/${this.solvedCount}`
+                });
+                if (profile.history.length > 5) profile.history = profile.history.slice(0, 5);
+
+                this.safeSetStorage('ms_profiles', this.profiles);
+
+                this.sendScoreToCloud(this.score, accuracy, this.selectedOp);
+
+                const rank = this.getStudentRank(profile.id);
+                document.getElementById('results-lb-rank-title').textContent = `Ranked #${rank} in Class Leaderboard!`;
+                document.getElementById('results-lb-rank-subtitle').textContent = `You earned +${earnedGrowth} growth points!`;
+
+                document.getElementById('res-score').textContent = this.score;
+                document.getElementById('res-accuracy').textContent = `${accuracy}%`;
+                document.getElementById('res-solved').textContent = `${this.correctCount}/${this.solvedCount}`;
+                document.getElementById('res-streak').textContent = `${this.maxStreak}🔥`;
+
+                const reviewSection = document.getElementById('results-review-section');
+                const wrongList = document.getElementById('review-wrong-list');
+                if (this.wrongFactsList.length > 0) {
+                    reviewSection.classList.remove('hidden');
+                    wrongList.innerHTML = [...new Set(this.wrongFactsList)].map(f => `<div class="p-2 bg-slate-900 rounded-lg text-rose-300 font-bold">${this.escapeHtml(f)}</div>`).join('');
+                } else {
+                    reviewSection.classList.add('hidden');
+                }
+
+                this.showScreen('results');
+            }
+
+            openSwitchStudentModal() {
+                const list = document.getElementById('switch-student-list');
+                list.innerHTML = this.profiles.map(p => `
+                    <div onclick="app.switchStudent('${p.id}')" class="p-3 rounded-xl border cursor-pointer flex items-center justify-between bg-slate-900 hover:bg-slate-800 transition-all ${p.id === this.activeProfileId ? 'border-purple-500 bg-purple-950/30' : 'border-slate-800'}">
+                        <div class="flex items-center space-x-3">
+                            <span class="text-2xl">${p.avatar}</span>
+                            <span class="font-bold text-sm text-white">${this.escapeHtml(p.name)}</span>
+                        </div>
+                        <span class="text-xs text-yellow-400 font-bold">PB: ${p.pb || 0} pts</span>
+                    </div>
+                `).join('');
+                document.getElementById('modal-switch-student').classList.remove('hidden');
+            }
+
+            switchStudent(id) {
+                this.audio.playClick();
+                this.activeProfileId = id;
+                this.safeSetStorage('ms_active_profile', id);
+                this.closeModal('modal-switch-student');
+                this.updateActiveScholarUI();
+                this.renderLeaderboardWidget();
+            }
+
+            openEditMyProfileModal() {
+                const profile = this.getActiveProfile();
+                document.getElementById('my-profile-name').value = profile.name;
+                this.selectedAvatar = profile.avatar;
+
+                this.renderMyProfileAvatarOptions();
+
+                const badgesGrid = document.getElementById('studentBadgesGrid');
+                const badges = profile.badges || [];
+                badgesGrid.innerHTML = badges.length > 0 
+                    ? badges.map(b => `<div class="p-2 bg-slate-900 rounded-lg text-xs text-amber-300 font-bold">🏅 ${this.escapeHtml(b)}</div>`).join('') 
+                    : '<div class="text-xs text-slate-400">No badges earned yet. Complete missions!</div>';
+
+                const historyGrid = document.getElementById('studentHistoryGrid');
+                const history = profile.history || [];
+                if (historyGrid) {
+                    historyGrid.innerHTML = history.length > 0
+                        ? history.slice(0, 5).map(h => `
+                            <div class="p-2 bg-slate-900/90 rounded-lg border border-slate-800 flex items-center justify-between text-[11px]">
+                                <div>
+                                    <span class="font-bold text-purple-300">${this.escapeHtml(h.op || 'Mission')}</span>
+                                    <span class="text-slate-500 text-[10px] ml-1">${this.escapeHtml(h.date || '')}</span>
+                                </div>
+                                <div class="flex items-center space-x-2">
+                                    <span class="text-yellow-400 font-bold">${h.score} pts</span>
+                                    <span class="text-emerald-400 font-semibold">${h.accuracy}%</span>
+                                </div>
+                            </div>
+                        `).join('')
+                        : '<div class="text-xs text-slate-400 p-2">No practice history yet. Complete a mission!</div>';
+                }
+
+                document.getElementById('modal-edit-my-profile').classList.remove('hidden');
+            }
+
+            renderMyProfileAvatarOptions() {
+                const avatarGrid = document.getElementById('my-profile-avatar-options');
+                avatarGrid.innerHTML = AVATARS.map(av => `
+                    <button type="button" onclick="app.selectAvatar('${av}')" class="h-10 text-xl rounded-xl border flex items-center justify-center ${av === this.selectedAvatar ? 'bg-purple-600 border-purple-400' : 'bg-slate-900 border-slate-700'}">${av}</button>
+                `).join('');
+            }
+
+            selectAvatar(av) {
+                this.selectedAvatar = av;
+                this.renderMyProfileAvatarOptions();
+            }
+
+            saveMyProfile(e) {
+                e.preventDefault();
+                const profile = this.getActiveProfile();
+                const inputName = document.getElementById('my-profile-name').value.trim();
+                if (!inputName) return;
+                
+                profile.name = inputName;
+                profile.avatar = this.selectedAvatar;
+                this.safeSetStorage('ms_profiles', this.profiles);
+                this.closeModal('modal-edit-my-profile');
+                this.updateActiveScholarUI();
+                this.renderLeaderboardWidget();
+                this.showToast("Profile updated successfully!", "🎓");
+            }
+
+            accessTeacherZone() {
+                if (this.isTeacherAuthenticated) {
+                    this.showScreen('teacher');
+                } else {
+                    document.getElementById('teacher-auth-input').value = '';
+                    document.getElementById('teacher-auth-error').classList.add('hidden');
+                    document.getElementById('modal-teacher-auth').classList.remove('hidden');
+                }
+            }
+
+            verifyTeacherPassword(e) {
+                e.preventDefault();
+                const val = document.getElementById('teacher-auth-input').value.trim();
+                if (val === this.teacherPassword) {
+                    this.isTeacherAuthenticated = true;
+                    this.closeModal('modal-teacher-auth');
+                    this.showScreen('teacher');
+                } else {
+                    document.getElementById('teacher-auth-error').classList.remove('hidden');
+                }
+            }
+
+            openChangePasswordModal() {
+                document.getElementById('pass-current-input').value = '';
+                document.getElementById('pass-new-input').value = '';
+                document.getElementById('modal-change-password').classList.remove('hidden');
+            }
+
+            saveNewTeacherPassword(e) {
+                e.preventDefault();
+                const curr = document.getElementById('pass-current-input').value.trim();
+                const newPass = document.getElementById('pass-new-input').value.trim();
+                if (curr === this.teacherPassword && newPass) {
+                    this.teacherPassword = newPass;
+                    this.safeSetStorage('ms_teacher_password', newPass);
+                    this.closeModal('modal-change-password');
+                    this.showToast('Passcode updated successfully!', '🔑');
+                } else {
+                    this.showToast('Incorrect current passcode.', '⚠️');
+                }
+            }
+
+            renderTeacherDashboard() {
+                const tbody = document.getElementById('teacher-roster-tbody');
+                if (tbody) {
+                    tbody.innerHTML = this.profiles.map(p => `
+                        <tr class="hover:bg-slate-900/50">
+                            <td class="p-3 flex items-center space-x-2">
+                                <span class="text-xl">${p.avatar || '👨‍🏫'}</span>
+                                <span class="font-bold text-white">${this.escapeHtml(p.name)}</span>
+                            </td>
+                            <td class="p-3 text-slate-300">${p.missionsCompleted || 0}</td>
+                            <td class="p-3 text-yellow-400 font-bold">${p.pb || 0} pts</td>
+                            <td class="p-3 text-cyan-400 font-bold">${p.avgAccuracy || 0}%</td>
+                            <td class="p-3 text-right">
+                                <div class="inline-block text-left relative">
+                                    <button onclick="app.toggleActionMenu('${p.id}', event)" class="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-purple-300 border border-purple-500/30 text-xs font-bold flex items-center space-x-1.5 transition-all shadow-sm ml-auto">
+                                        <span>⚙️</span>
+                                        <span>Actions</span>
+                                        <span class="text-[10px] opacity-75">▼</span>
+                                    </button>
+                                    <div id="action-menu-${p.id}" class="hidden absolute right-0 mt-1 w-40 bg-slate-900 border border-slate-700 rounded-xl shadow-2xl z-30 py-1 divide-y divide-slate-800/80 text-left animate-pop-in">
+                                        <button onclick="app.openTeacherEditStudentModal('${p.id}'); app.closeAllActionMenus();" class="w-full px-3 py-2 text-xs font-semibold text-purple-300 hover:bg-slate-800 flex items-center space-x-2 text-left transition-colors">
+                                            <span>✏️</span>
+                                            <span>Edit Profile</span>
+                                        </button>
+                                        <button onclick="app.resetStudentProgress('${p.id}'); app.closeAllActionMenus();" class="w-full px-3 py-2 text-xs font-semibold text-amber-300 hover:bg-slate-800 flex items-center space-x-2 text-left transition-colors">
+                                            <span>🔄</span>
+                                            <span>Reset Progress</span>
+                                        </button>
+                                        <button onclick="app.deleteStudentProfile('${p.id}'); app.closeAllActionMenus();" class="w-full px-3 py-2 text-xs font-semibold text-rose-400 hover:bg-slate-800 flex items-center space-x-2 text-left transition-colors">
+                                            <span>🗑️</span>
+                                            <span>Delete Profile</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </td>
+                        </tr>
+                    `).join('');
+                }
+
+                const grid = document.getElementById('teacher-table-grid');
+                if (grid) {
+                    grid.innerHTML = Array.from({length: 12}, (_, i) => `
+                        <label class="flex items-center justify-center p-2 rounded-xl bg-slate-900 border border-purple-500/30 text-xs font-bold text-purple-300 cursor-pointer hover:bg-purple-950/50">
+                            <input type="checkbox" value="${i + 1}" class="teacher-table-checkbox mr-1.5 rounded bg-slate-950 border-slate-700 text-purple-600 focus:ring-0" checked>
+                            <span>${i + 1}s</span>
+                        </label>
+                    `).join('');
+                }
+            }
+
+            openTeacherEditStudentModal(id) {
+                const profile = this.profiles.find(p => p.id === id);
+                if (!profile) return;
+
+                document.getElementById('teacher-edit-student-id').value = profile.id;
+                document.getElementById('teacher-edit-student-name').value = profile.name;
+                this.teacherSelectedAvatar = profile.avatar || '👨‍🏫';
+
+                this.renderTeacherAvatarGrid();
+                document.getElementById('modal-teacher-edit-student').classList.remove('hidden');
+            }
+
+            renderTeacherAvatarGrid() {
+                const avatarGrid = document.getElementById('teacher-edit-avatar-options');
+                avatarGrid.innerHTML = AVATARS.map(av => `
+                    <button type="button" onclick="app.selectTeacherStudentAvatar('${av}')" class="h-10 text-xl rounded-xl border flex items-center justify-center ${av === this.teacherSelectedAvatar ? 'bg-purple-600 border-purple-400' : 'bg-slate-950 border-slate-700'}">${av}</button>
+                `).join('');
+            }
+
+            selectTeacherStudentAvatar(av) {
+                this.teacherSelectedAvatar = av;
+                this.renderTeacherAvatarGrid();
+            }
+
+            toggleActionMenu(id, event) {
+                if (event) event.stopPropagation();
+                const menu = document.getElementById(`action-menu-${id}`);
+                if (!menu) return;
+                const isHidden = menu.classList.contains('hidden');
+                this.closeAllActionMenus();
+                if (isHidden) {
+                    menu.classList.remove('hidden');
+                }
+            }
+
+            closeAllActionMenus() {
+                document.querySelectorAll('[id^="action-menu-"]').forEach(el => el.classList.add('hidden'));
+            }
+
+            saveTeacherStudentProfile(e) {
+                e.preventDefault();
+                const id = document.getElementById('teacher-edit-student-id').value;
+                const profile = this.profiles.find(p => p.id === id);
+                if (!profile) return;
+
+                const nameVal = document.getElementById('teacher-edit-student-name').value.trim();
+                if (!nameVal) return;
+
+                profile.name = nameVal;
+                profile.avatar = this.teacherSelectedAvatar;
+
+                this.safeSetStorage('ms_profiles', this.profiles);
+                this.closeModal('modal-teacher-edit-student');
+                this.renderTeacherDashboard();
+                this.updateActiveScholarUI();
+                this.renderLeaderboardWidget();
+                this.showToast(`Updated profile for ${profile.name}`, '✏️');
+            }
+
+            resetCurrentEditingStudentProgress() {
+                const id = document.getElementById('teacher-edit-student-id').value;
+                this.resetStudentProgress(id);
+            }
+
+            deleteCurrentEditingStudent() {
+                const id = document.getElementById('teacher-edit-student-id').value;
+                this.closeModal('modal-teacher-edit-student');
+                this.deleteStudentProfile(id);
+            }
+
+            deleteStudentProfile(id) {
+                const profile = this.profiles.find(p => p.id === id);
+                if (!profile) return;
+
+                if (this.profiles.length <= 1) {
+                    this.showToast("Cannot delete the only student profile in roster.", "⚠️");
+                    return;
+                }
+
+                this.showConfirm(
+                    `Delete Student Profile?`,
+                    `Are you sure you want to delete ${profile.name}? All scores and data will be permanently removed.`,
+                    () => {
+                        this.profiles = this.profiles.filter(p => p.id !== id);
+                        if (this.activeProfileId === id) {
+                            this.activeProfileId = this.profiles[0].id;
+                            this.safeSetStorage('ms_active_profile', this.activeProfileId);
+                        }
+                        this.safeSetStorage('ms_profiles', this.profiles);
+                        this.renderTeacherDashboard();
+                        this.updateActiveScholarUI();
+                        this.renderLeaderboardWidget();
+                        this.showToast(`Deleted ${profile.name} from class roster`, '🗑️');
+                    }
+                );
+            }
+
+            openCreateProfileModal() {
+                const newName = prompt("Enter new student name:") || "New Scholar";
+                if (newName.trim()) {
+                    const newProfile = {
+                        id: String(Date.now()),
+                        name: newName.trim(),
+                        avatar: AVATARS[Math.floor(Math.random() * AVATARS.length)],
+                        history: [],
+                        pb: 0,
+                        growthPoints: 0,
+                        badges: ['First Step'],
+                        missionsCompleted: 0,
+                        avgAccuracy: 0
+                    };
+                    this.profiles.push(newProfile);
+                    this.safeSetStorage('ms_profiles', this.profiles);
+                    this.renderTeacherDashboard();
+                    this.showToast(`Added ${newProfile.name} to roster!`, '➕');
+                }
+            }
+
+            resetStudentProgress(id) {
+                const p = this.profiles.find(x => x.id === id);
+                if (p) {
+                    this.showConfirm(
+                        `Reset Progress?`,
+                        `Are you sure you want to reset all progress for ${p.name}?`,
+                        () => {
+                            p.pb = 0;
+                            p.growthPoints = 0;
+                            p.missionsCompleted = 0;
+                            p.avgAccuracy = 0;
+                            p.history = [];
+                            p.badges = ['First Step'];
+                            this.safeSetStorage('ms_profiles', this.profiles);
+                            this.renderTeacherDashboard();
+                            this.showToast(`Reset progress for ${p.name}`, '🔄');
+                        }
+                    );
+                }
+            }
+
+            selectAllTeacherTables() {
+                document.querySelectorAll('.teacher-table-checkbox').forEach(cb => cb.checked = true);
+            }
+
+            clearTeacherTables() {
+                document.querySelectorAll('.teacher-table-checkbox').forEach(cb => cb.checked = false);
+            }
+
+            onTeacherOpChange(val) {
+                this.showToast(`Target operation changed to ${val}`, "⚙️");
+            }
+
+            teacherTestRun(op) {
+                this.setOperation(op);
+                this.startMission();
+            }
+
+            teacherTestRunSelected() {
+                const checkboxes = document.querySelectorAll('.teacher-table-checkbox:checked');
+                const selected = Array.from(checkboxes).map(cb => parseInt(cb.value, 10));
+                if (selected.length > 0) {
+                    this.selectedTables = selected;
+                    this.renderTableSelector();
+                }
+                const opSelect = document.getElementById('teacher-op-select');
+                if (opSelect) {
+                    this.setOperation(opSelect.value);
+                }
+                this.startMission();
+            }
+        }
+
+        let app;
+        window.addEventListener('DOMContentLoaded', () => {
+            app = new MathScholarApp();
+        });
+    </script>
+</body>
+</html>
